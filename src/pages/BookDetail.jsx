@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 
-import {useBooks} from '../contexts/BooksContext'
+// import {useBooks} from '../contexts/BooksContext' 이거 대신, 아래 라인 import
+import {getBooks} from '../api'; // 이거 import !
 import { useAuth } from "../contexts/AuthContext"
 import { useInterestedBooks } from '../contexts/InterestedBooksContext'
 import {useBorrowedBooks } from '../contexts/BorrowedBooksContext'
@@ -25,7 +26,18 @@ export default function BookDetail({  }){
     const {loggedInMemberId, setLoggedInMemberId} = useAuth();
     const formattedMemberId = loggedInMemberId!==0 ? "m-" + loggedInMemberId : 0;
 
-    const {books, setBooks} = useBooks();
+    const [books, setBooks] = useState([]); // 기본으로 일단 남겨두고, 아래 useEffect 에서 fetch해올 것임.
+    useEffect(()=>{                         // 여기 import.
+        async function fetchBooks(){
+            try {
+                const res = await getBooks();
+                setBooks(res.data);
+            } catch (err) {
+                console.error('도서 목록을 불러오는데 실패했습니다:', err);
+            }
+        }
+        fetchBooks();
+    }, []);
     const {interestedBooks, setInterestedBooks} = useInterestedBooks();
     const {borrowedBooks, setBorrowedBooks} = useBorrowedBooks();
 

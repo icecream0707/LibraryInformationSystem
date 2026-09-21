@@ -27,7 +27,7 @@ export default function BookCards({ filteredBooks }){
         <>
             <div className="cardWrapper">
                 {filteredBooks.slice((currPage-1)*4, (currPage-1)*4+4).map(b=>(
-                    <BookCard key={b.bookId} book={b}/>
+                    <BookCard key={b.book_id} book={b}/>
                 ))}
             </div>
             {(isMoreThanStandard)&&(

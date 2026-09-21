@@ -1,21 +1,33 @@
 import { useSearchParams } from 'react-router-dom'
 import { useState, useEffect } from 'react';
-import {useBooks} from '../contexts/BooksContext'
+// import {useBooks} from '../contexts/BooksContext' 이거 대신, 아래 라인 import
+import {getBooks} from '../api'; // 이거 import !
 import BookCards from '../conponents/BookCards';
 
 
 export default function BookSearch({  }){
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams(); // useNavigate() 가 내장되어 있어서, 쿼리파라미터를 바꾼 경로로 이동(요청)
     const search = searchParams.get('search');
     const category = searchParams.get('category');
 
-    const {books, setBooks} = useBooks();
+    const [books, setBooks] = useState([]); // 기본으로 일단 남겨두고, 아래 useEffect 에서 fetch해올 것임.
+    useEffect(()=>{                         // 여기 import.
+        async function fetchBooks(){
+            try {
+                const res = await getBooks();
+                setBooks(res.data);
+            } catch (err) {
+                console.error('도서 목록을 불러오는데 실패했습니다:', err);
+            }
+        }
+        fetchBooks();
+    }, []);
 
     const [filteredBooks, setFilteredBooks] = useState([]);
 
     //search, category, books 가 바뀔때마다 setFilteredBooks 한다.
     useEffect(()=>{
-        let result = books.Books;
+        let result = books;
         if(search){
             const searchApply = search.toLowerCase();
             result = result.filter(b=>b.title.toLowerCase().includes(searchApply));
@@ -24,14 +36,7 @@ export default function BookSearch({  }){
             result = result.filter(b=>b.category===category);
         }
 
-        if(!search && !category){
-            const sorted = [...result].sort((a,b)=>a.title.localeCompare(b.title, 'ko'));
-            const adBook = sorted.find(b=>b.ad);
-            const rest = sorted.filter(b=>!b.ad);
-            setFilteredBooks(adBook ? [adBook, ...rest] : rest);
-        } else {
-            setFilteredBooks([...result].sort((a,b)=>a.title.localeCompare(b.title, 'ko')));
-        }
+        setFilteredBooks([...result].sort((a,b)=>a.title.localeCompare(b.title, 'ko')));
     }, [search, category, books]);
 
     const [searchInput, setSearchInput] = useState("");
@@ -48,10 +53,8 @@ export default function BookSearch({  }){
 //     ],
 // };
 
-    //search, category 둘다 쿼리스트링에 들어오지 않았을때는 "가나다"순으로 도서 정렬 display.
-    //단, 광고중인 도서 1권을 가장 상단에 띄우기. 광고는 한권밖에 안된다??????
-
-    //나머지는 정렬하여서 광고없이 display
+    //search, category 조건에 맞게 필터링된 결과를 "가나다"순으로 정렬하여 display.
+    //(광고 도서 우선노출 기능은 DB에 해당 필드가 없어 제거함)
     function submitHandler(e){
         e.preventDefault();
 
@@ -75,6 +78,7 @@ export default function BookSearch({  }){
                             <select className="select" value={categoryInput} onChange={(e)=>setCategoryInput(e.target.value)}>
                                 <option value="전체">전체</option>
                                 <option value="IT">IT</option>
+                                <option value="프로그래밍">프로그래밍</option>
                                 <option value="문학">문학</option>
                                 <option value="아동">아동</option>
                                 <option value="잡지">잡지</option>
