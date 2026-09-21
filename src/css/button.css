@@ -1,0 +1,25 @@
+/* 메뉴 버튼 */
+.btn {border:solid 1px rgb(136, 130, 130); border-radius: 10px;
+      padding:10px 15px; transition: transform 0.5s ease;
+      display: inline-block;
+      text-decoration: none; color:black;}
+.btn:hover {background-color: orange; transform: translateY(-2px);}
+.btn.basic {background:transparent;}
+.btn.special {color:white; background-color: rgb(1, 18, 47);}
+.btn.active{background-color: orange;}
+
+
+.brand {font-size:20px; color:rgb(1, 29, 47); }
+
+/* 상태 버튼 */
+.badge {border-radius: 20px; color:white;
+        display: inline; padding: 5px 10px;
+        background-color: orange;}
+
+.badge.ok {background-color: green;}
+
+.select{
+      height:40px; width:100px;
+      margin:0 10px;
+      border-radius: 10px;
+}
